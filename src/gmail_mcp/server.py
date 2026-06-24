@@ -77,6 +77,29 @@ def download_attachment(
     )
 
 
+@mcp.tool()
+def download_attachment_local(
+    message_id: str,
+    dest_dir: str,
+    attachment_id: str = "",
+    filename: str = "",
+) -> dict:
+    """Download an attachment from a Gmail message and save it to a local directory.
+
+    Identify the attachment by `filename` (preferred — stable across requests) or `attachment_id`;
+    if the message has exactly one attachment, neither is required. `dest_dir` is expanded (`~`)
+    and created if absent. Returns the absolute `path`, `name`, and `size_bytes` of the saved file.
+    """
+    gmail, _ = auth.get_services()
+    return attachments.download_attachment_to_local(
+        gmail,
+        message_id,
+        dest_dir,
+        attachment_id=attachment_id or None,
+        filename=filename or None,
+    )
+
+
 def main():
     """Entry point: run the server over stdio."""
     mcp.run(transport="stdio")
