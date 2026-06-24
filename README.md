@@ -1,13 +1,14 @@
 # gmail-mcp
 
 A local **stdio** [MCP](https://modelcontextprotocol.io) server that gives your local Claude clients
-three Gmail tools:
+these Gmail tools:
 
 | Tool | What it does |
 |------|--------------|
 | `send_email` | Send mail from your Gmail/Workspace address (plain or HTML, cc/bcc). Every send is logged. |
 | `search_emails` | Search Gmail (`has:attachment from:bob newer_than:7d`…) and return message summaries **including attachment metadata**. |
 | `download_attachment` | Pull an attachment from a message and **upload it to your Google Drive**, returning the Drive link. |
+| `download_attachment_local` | Pull an attachment from a message and **save it to a local directory** (`dest_dir`, expanded and created if absent), returning the saved file path. |
 
 ## Design
 

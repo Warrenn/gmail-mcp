@@ -1,14 +1,19 @@
-"""Phase 5: MCP wiring — three tools registered and delegating to the core functions."""
+"""Phase 5: MCP wiring — tools registered and delegating to the core functions."""
 
 import asyncio
 
 import gmail_mcp.server as server
 
 
-def test_three_tools_registered():
+def test_tools_registered():
     tools = asyncio.run(server.mcp.list_tools())
     names = {t.name for t in tools}
-    assert names == {"send_email", "search_emails", "download_attachment"}
+    assert names == {
+        "send_email",
+        "search_emails",
+        "download_attachment",
+        "download_attachment_local",
+    }
 
 
 def test_tools_have_descriptions():
@@ -71,6 +76,30 @@ def test_download_tool_delegates(monkeypatch):
     assert captured["attachment_id"] == "att-1"
     assert captured["filename"] is None
     assert captured["folder_name"] == "Gmail Attachments"
+
+
+def test_download_local_tool_delegates(monkeypatch):
+    captured = {}
+    monkeypatch.setattr(server.auth, "get_services", lambda: ("GMAIL", "DRIVE"))
+
+    def fake_dl_local(gmail, message_id, dest_dir, attachment_id=None, filename=None):
+        captured.update(
+            gmail=gmail,
+            message_id=message_id,
+            dest_dir=dest_dir,
+            attachment_id=attachment_id,
+            filename=filename,
+        )
+        return {"path": "/tmp/x/invoice.pdf", "name": "invoice.pdf", "size_bytes": 4}
+
+    monkeypatch.setattr(server.attachments, "download_attachment_to_local", fake_dl_local)
+    out = server.download_attachment_local(message_id="m1", dest_dir="/tmp/x", filename="invoice.pdf")
+    assert out["path"] == "/tmp/x/invoice.pdf"
+    assert captured["gmail"] == "GMAIL"
+    assert captured["message_id"] == "m1"
+    assert captured["dest_dir"] == "/tmp/x"
+    assert captured["filename"] == "invoice.pdf"
+    assert captured["attachment_id"] is None  # empty string normalized to None
 
 
 def test_main_runs_stdio_transport(monkeypatch):
