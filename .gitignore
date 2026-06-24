@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets / tokens — never commit
+*token*.json
+client_secret*.json
+.env
+.env.local
+
+# Internal planning/build-log doc (kept local, not published)
+STRATEGY.md
+
+# macOS
+.DS_Store
+
+# Test artifacts
+.pw-artifacts/
